@@ -6,6 +6,7 @@ import App from './App';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import ForgotPassword from './components/auth/ForgotPassword';
+import EmailVerify from './components/auth/EmailVerify';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -13,13 +14,12 @@ const router = createBrowserRouter(
       <Route path='/login' element={<Login />} />
       <Route path='/register' element={<Register />} />
       <Route path='/forgot-password' element={<ForgotPassword />} />
+      <Route path='/users/:id/verify/:token' element={<EmailVerify />} />
     </Route>
   )
 )
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+  <RouterProvider router={router} />
 );

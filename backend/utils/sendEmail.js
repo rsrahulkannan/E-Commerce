@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const sendMail = async (email, subject, text) => {
+const sendMail = async (name, email, subject, verifyUrl) => {
     try {
         const transporter = nodemailer.createTransport({
             host: process.env.MAIL_HOST,
@@ -11,11 +11,21 @@ const sendMail = async (email, subject, text) => {
             }
         });
 
+        const emailtemplate = `
+            <html>
+                <body>
+                    <h1>Hello, ${name}</h1>
+                    <p>Thank you for signing up with us. To verify your account click the below button</p>
+                    <a href='${verifyUrl}'>Verify</a>
+                <body>
+            </html>
+        `;
+
         await transporter.sendMail({
             from: process.env.MAIL_USER,
             to: email,
             subject: subject,
-            text: text
+            html: emailtemplate
         });
 
         console.log(`Email has been send successfully`);

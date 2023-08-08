@@ -1,15 +1,18 @@
 import React, { useState } from 'react'
 import axios from 'axios';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
 import './Auth.css'
 
 const Register = () => {
+    const [isLoading, setIsLoading] = useState(false)
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+
+    const navigate = useNavigate();
 
     const submitHandler = async (e) => {
         e.preventDefault();
@@ -17,6 +20,8 @@ const Register = () => {
             toast.error('Password do not match')
         }
         else {
+            setIsLoading(true);
+
             const formData = new URLSearchParams();
             formData.append('firstName', firstName);
             formData.append('lastName', lastName);
@@ -31,11 +36,15 @@ const Register = () => {
             })
             .then((res) => {
                 console.log('API response data:', res.data);
-                toast.success('Registration successfull!')
+                toast.success(res?.data?.message || 'Registration successfull!')
             })
             .catch((err) => {
                 console.error('Error:', err);
                 toast.error(err.response?.data?.message || 'Registration failed, Try again!')
+            })
+            .finally(() => {
+                navigate('/login')
+                setIsLoading(false);
             });
         }
     }
@@ -99,7 +108,13 @@ const Register = () => {
                                     <span className="custom-control-label">By creating an account, you agree the <Link to={'/terms-conditions'} target='__blank'>terms and conditions.</Link></span>
                                 </label>
                             </div>
-                            <button type="submit" className="btn btn-primary btn-lg btn-block">Register My Account</button>
+                            {
+                                isLoading ? 
+                                <div className='text-center'>
+                                    <span class="dashboard-spinner spinner-danger spinner-sm"></span>
+                                </div> :
+                                <button type="submit" className="btn btn-primary btn-lg btn-block">Register My Account</button>
+                            }
                         </form>
                     </div>
                     <div className="card-footer bg-white">
