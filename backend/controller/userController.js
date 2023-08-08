@@ -42,10 +42,8 @@ const registerUser = asynchandler(async (req, res) => {
                 password: undefined,
             };
     
-            // const token = generateToken(user._id);
             res.status(200).json({
                 data: {
-                    // token: token,
                     user: userDataWithoutPassword
                 },
                 message: 'Your account is registered, An Email sent to your account please verify!'
@@ -59,6 +57,39 @@ const registerUser = asynchandler(async (req, res) => {
         throw new Error('Invalid user data')
     }
 });
+
+const authUser = asynchandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    const userExists = await User.findOne({email});
+
+    if(userExists && await userExists.matchPassword(password)) {
+        const token = generateToken(userExists._id);
+
+        res.cookie('userToken', token, {
+            httpOnly: true,
+            // secure: process.env.NODE_ENV !== 'development',
+            secure: false,
+            sameSite: 'none',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+
+        const userDataWithoutPassword = {
+            ...userExists._doc,
+            password: undefined,
+        };
+
+        res.status(200).json({
+            data: {
+                user: userDataWithoutPassword
+            },
+            message: 'You have been logged into your account'
+        })
+    } else {
+        res.status(400);
+        throw new Error('Invalid email or password');
+    }
+})
 
 const verifyToken = asynchandler(async (req, res) => {
     console.log(req.params);
@@ -90,5 +121,6 @@ const verifyToken = asynchandler(async (req, res) => {
 
 export {
     registerUser,
+    authUser,
     verifyToken
 }

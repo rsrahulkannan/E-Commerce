@@ -17,6 +17,7 @@ const sendMail = async (name, email, subject, verifyUrl) => {
                     <h1>Hello, ${name}</h1>
                     <p>Thank you for signing up with us. To verify your account click the below button</p>
                     <a href='${verifyUrl}'>Verify</a>
+                    <p>Link will be expire in an hour</p>
                 <body>
             </html>
         `;
