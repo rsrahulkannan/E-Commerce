@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import './Auth.css'
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import Cookies from 'js-cookie'
 
 const Login = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -29,8 +28,16 @@ const Login = () => {
         })
         .then((res) => {
             console.log('API response data:', res.data);
+			localStorage.setItem('jwt-auth-token', res.data.data.token);
             toast.success(res?.data?.message || 'Login successfull!')
-            navigate('/')
+
+            const timeout = setTimeout(() => {
+                navigate('/');
+            }, 1000); // Delay the navigation by 1 second
+    
+            return () => {
+                clearTimeout(timeout); // Clear the timeout on unmount
+            };
         })
         .catch((err) => {
             console.error('Error:', err);
@@ -38,34 +45,6 @@ const Login = () => {
             setIsLoading(false);
         })
     }
-
-    useEffect(() => {
-        const getToken = async () => {
-            try {
-                const token = Cookies.get('userToken'); // Make sure 'userToken' is the correct cookie name
-                console.log('Token:', token);
-    
-                if (token) {
-                    toast.success('Token generated');
-                } else {
-                    toast.error('No token');
-                }
-            } catch (error) {
-                toast.error('Error getting token');
-            }
-        };
-    
-        getToken();
-    }, []);
-
-    // useEffect(() => {
-    //     const token = Cookies.get('userToken');
-    //     console.log('Token:' + token);
-
-    //     if(token) {
-    //         // navigate('/')
-    //     }
-    // }, [])
     
 
     return (
@@ -106,7 +85,7 @@ const Login = () => {
                             {
                                 isLoading ?
                                 <div className='text-center'>
-                                    <span class="dashboard-spinner spinner-danger spinner-sm"></span>
+                                    <span className="dashboard-spinner spinner-danger spinner-sm"></span>
                                 </div> :
                             <   button type="submit" className="btn btn-primary btn-lg btn-block">Sign in</button>
                             }

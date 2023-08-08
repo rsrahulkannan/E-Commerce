@@ -1,11 +1,9 @@
 import axios from "axios"
-import { Fragment, useEffect, useState } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
+import { Fragment, useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 import { toast } from "react-toastify"
 
 const EmailVerify = () => {
-    const [validUrl, setValidUrl] = useState(true);
-
     const param = useParams();
     const navigate = useNavigate();
 
@@ -15,18 +13,16 @@ const EmailVerify = () => {
                 const url = `http://localhost:5001/api/users/${param.id}/verify/${param.token}`;
                 const { data } = await axios.get(url);
                 console.log(data);
-                setValidUrl(true);
                 toast.success('Your email has been verified! Now log in to your account')
             } catch (error) {
                 console.log(error);
-                setValidUrl(false);
                 toast.error('Invalid url! Try again')
             } finally {
                 navigate('/login')
             }
         }
         verifyEmailUrl();
-    }, []);
+    }, [navigate]);
 
     return (
         <Fragment>

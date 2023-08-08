@@ -4,6 +4,7 @@ import Token from '../model/tokenModel.js';
 import generateToken from '../utils/generateToken.js';
 import sendMail from '../utils/sendEmail.js';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 
 // @desc Register suer
 // route POST /api/users
@@ -64,27 +65,51 @@ const authUser = asynchandler(async (req, res) => {
     const userExists = await User.findOne({email});
 
     if(userExists && await userExists.matchPassword(password)) {
-        const token = generateToken(userExists._id);
+        if(userExists.isVerified) {
 
-        res.cookie('userToken', token, {
-            httpOnly: true,
-            // secure: process.env.NODE_ENV !== 'development',
-            secure: false,
-            sameSite: 'none',
-            maxAge: 30 * 24 * 60 * 60 * 1000
-        });
+            const token = generateToken(userExists._id);
+    
+            // res.cookie('userToken', token, {
+            //     httpOnly: true,
+            //     // secure: process.env.NODE_ENV !== 'development',
+            //     secure: false,
+            //     sameSite: 'none',
+            //     maxAge: 30 * 24 * 60 * 60 * 1000
+            // });
+    
+            const userDataWithoutPassword = {
+                ...userExists._doc,
+                password: undefined,
+            };
+    
+            res.status(200).json({
+                data: {
+                    token: token,
+                    user: userDataWithoutPassword
+                },
+                message: 'You have been logged into your account'
+            })
+        } else {
+            const tokenExists = await Token.findOne({
+                userId: userExists._id
+            });
 
-        const userDataWithoutPassword = {
-            ...userExists._doc,
-            password: undefined,
-        };
+            if(!tokenExists) {
+                const token = await Token.create({
+                    userId: userExists._id,
+                    token: crypto.randomBytes(32).toString('hex')
+                })
 
-        res.status(200).json({
-            data: {
-                user: userDataWithoutPassword
-            },
-            message: 'You have been logged into your account'
-        })
+                if(token) {
+                    const url = `${process.env.BASE_URL}/users/${userExists._id}/verify/${token.token}`;
+        
+                    await sendMail(userExists.firstName + ' ' + userExists.lastName, userExists.email, 'Verify your email', url);
+                }
+            }
+
+            res.status(400);
+            throw new Error('You havent yet verified your account. We have send you an email');
+        }
     } else {
         res.status(400);
         throw new Error('Invalid email or password');
@@ -92,7 +117,6 @@ const authUser = asynchandler(async (req, res) => {
 })
 
 const verifyToken = asynchandler(async (req, res) => {
-    console.log(req.params);
     try {
         const user = await User.findOne({ _id: req.params.id });
         if(user) {
@@ -119,8 +143,88 @@ const verifyToken = asynchandler(async (req, res) => {
     }
 });
 
+const forgotPassword = asynchandler(async (req, res) => {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if(user) {
+        const token = await Token.create({
+            userId: user._id,
+            token: crypto.randomBytes(32).toString('hex')
+        })
+
+        if(token) {
+            const url = `${process.env.BASE_URL}/users/${user._id}/reset/${token.token}`;
+
+            await sendMail(user.firstName + ' ' + user.lastName, user.email, 'Forgot Password?', url);
+        }
+    } 
+
+    res.status(200).json({ message: 'We have send verification link to your Email' });
+})
+
+const verifyUrl = asynchandler(async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.params.id });
+        if(user) {
+            const token = await Token.findOne({
+                userId: req.params.id,
+                token: req.params.token
+            });
+
+            if(token) {
+                res.status(200).json({ message: "Url verified successfully" });
+            } else {
+            res.status(400);
+            throw new Error('Invalid link1')
+        }
+        } else {
+            res.status(400);
+            throw new Error('Invalid link2')
+        }
+    } catch (error) {
+        res.status(400);
+        throw new Error(error)
+    }
+});
+
+const resetPassword = asynchandler(async (req, res) => {
+    const {password} = req.body;
+
+    try {
+        const user = await User.findOne({ _id: req.params.id });
+        if(user) {
+            const token = await Token.findOneAndDelete({
+                userId: req.params.id,
+                token: req.params.token
+            });
+
+            if(token) {
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(password, salt);
+
+                await User.updateOne({ _id: user._id}, { $set: { password: hashedPassword }});
+
+                res.status(200).json({ message: "Password has benn updated", password: hashedPassword });
+            } else {
+                res.status(400);
+                throw new Error('Invalid link1')
+            }
+        } else {
+            res.status(400);
+            throw new Error('Invalid link2')
+        }
+    } catch (error) {
+        res.status(400);
+        throw new Error(error)
+    }
+});
+
 export {
     registerUser,
     authUser,
-    verifyToken
+    verifyToken,
+    forgotPassword,
+    resetPassword,
+    verifyUrl
 }
