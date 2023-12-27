@@ -3,7 +3,8 @@ body {
     height: 100%;
 }
 
-body {
+.splash-container {
+    height: 100%;
     display: -ms-flexbox;
     display: flex;
     justify-content: center;

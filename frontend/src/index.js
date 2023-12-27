@@ -16,11 +16,11 @@ const routes = (
   <Route path='/' element={<App />}>
     {token ? (
       <>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Navigate replace to="/dashboard" />} />
       </>
     ) : (
       <>
-			  <Route path="/" element={<Navigate replace to="/login" />} />
+        <Route path="/" element={<Navigate replace to="/login" />} />
         <Route path='/register' element={<Register />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/users/:id/verify/:token' element={<EmailVerify />} />
@@ -28,7 +28,7 @@ const routes = (
       </>
     )}
     <Route path="/logout" element={<Logout />} />
-        <Route path='/login' element={<Login />} />
+    <Route path='/login' element={<Login />} />
     <Route path="/dashboard" element={<Dashboard />} />
     <Route path="*" element={<Navigate replace to="/" />} />
   </Route>
