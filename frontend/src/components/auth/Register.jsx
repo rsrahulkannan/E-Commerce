@@ -16,9 +16,16 @@ const Register = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
-        if(password !== confirmPassword) {
+        if(!firstName)
+            toast.error('First name required')
+        else if(!lastName)
+            toast.error('Last name required')
+        else if(!email)
+            toast.error('Email required')
+        else if(!password)
+            toast.error('Password required')
+        else if(password !== confirmPassword)
             toast.error('Password do not match')
-        }
         else {
             setIsLoading(true);
 

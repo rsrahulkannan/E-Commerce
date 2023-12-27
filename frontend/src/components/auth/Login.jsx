@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
-import './Auth.css'
 import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import './Auth.css'
 
 const Login = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -30,14 +30,7 @@ const Login = () => {
             console.log('API response data:', res.data);
 			localStorage.setItem('jwt-auth-token', res.data.data.token);
             toast.success(res?.data?.message || 'Login successfull!')
-
-            const timeout = setTimeout(() => {
-                navigate('/');
-            }, 1000); // Delay the navigation by 1 second
-    
-            return () => {
-                clearTimeout(timeout); // Clear the timeout on unmount
-            };
+            navigate('/dashboard')
         })
         .catch((err) => {
             console.error('Error:', err);
