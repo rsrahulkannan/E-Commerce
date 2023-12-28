@@ -1,15 +1,21 @@
 import React, { useState } from 'react'
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './Auth.css'
+import useAuth from '../../hooks/useAuth';
 
 const Login = () => {
+    const { setAuth } = useAuth();
+
     const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
     const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || '/dashboard';
+    console.log(location.state?.from);
 
     const submitHandler = async (e) => {
         e.preventDefault();
@@ -29,8 +35,10 @@ const Login = () => {
         .then((res) => {
             console.log('API response data:', res.data);
 			localStorage.setItem('jwt-auth-token', res.data.data.token);
+            const accessToken = res.data.data.token;
             toast.success(res?.data?.message || 'Login successfull!')
-            navigate('/dashboard')
+            setAuth({ accessToken })
+            navigate(from, { replace: true });
         })
         .catch((err) => {
             console.error('Error:', err);
