@@ -42,12 +42,10 @@ const Register = () => {
                 withCredentials: true,
             })
             .then((res) => {
-                console.log('API response data:', res.data);
                 toast.success(res?.data?.message || 'Registration successfull!')
                 navigate('/login')
             })
             .catch((err) => {
-                console.error('Error:', err);
                 toast.error(err.response?.data?.message || 'Registration failed, Try again!')
                 setIsLoading(false);
             })

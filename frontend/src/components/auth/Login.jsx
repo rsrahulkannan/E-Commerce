@@ -15,7 +15,6 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || '/dashboard';
-    console.log(location.state?.from);
 
     const submitHandler = async (e) => {
         e.preventDefault();
@@ -33,15 +32,13 @@ const Login = () => {
             withCredentials: true,
         })
         .then((res) => {
-            console.log('API response data:', res.data);
-			localStorage.setItem('jwt-auth-token', res.data.data.token);
             const accessToken = res.data.data.token;
+            const user = res.data.data.user;
             toast.success(res?.data?.message || 'Login successfull!')
-            setAuth({ accessToken })
+            setAuth({ user, accessToken })
             navigate(from, { replace: true });
         })
         .catch((err) => {
-            console.error('Error:', err);
             toast.error(err.response?.data?.message || 'Login failed, Try again!')
             setIsLoading(false);
         })

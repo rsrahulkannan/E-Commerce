@@ -18,10 +18,8 @@ const ResetPassword = () => {
             try {
                 const url = `http://localhost:5001/api/users/${param.id}/reset/${param.token}`;
                 const { data } = await axios.get(url);
-                console.log(data);
                 setValidUrl(true);
             } catch (error) {
-                console.log(error);
                 setValidUrl(false);
                 toast.error('Url is expired or broken, Try again after some times')
                 navigate('/login')

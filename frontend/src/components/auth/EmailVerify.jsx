@@ -12,10 +12,8 @@ const EmailVerify = () => {
             try {
                 const url = `http://localhost:5001/api/users/${param.id}/verify/${param.token}`;
                 const { data } = await axios.get(url);
-                console.log(data);
                 toast.success('Your email has been verified! Now log in to your account')
             } catch (error) {
-                console.log(error);
                 toast.error('Invalid url! Try again')
             } finally {
                 navigate('/login')

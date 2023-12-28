@@ -8,9 +8,9 @@ const Dashboard = () => {
     <>
       <Header />
       <Sidebar />
-      <div class="dashboard-wrapper">
-        <div class="dashboard-ecommerce">
-          <div class="container-fluid dashboard-content ">
+      <div className="dashboard-wrapper">
+        <div className="dashboard-ecommerce">
+          <div className="container-fluid dashboard-content ">
           </div>
         </div>
         <Footer />

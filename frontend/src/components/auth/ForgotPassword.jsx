@@ -25,12 +25,10 @@ const ForgotPassword = () => {
             withCredentials: true,
         })
         .then((res) => {
-            console.log('API response data:', res.data);
             toast.success(res?.data?.message || 'Reset url link has been send to your email!')
             navigate('/')
         })
         .catch((err) => {
-            console.error('Error:', err);
             toast.error(err.response?.data?.message || 'Reset url link has been send to your email!')
             setIsLoading(false);
         })
