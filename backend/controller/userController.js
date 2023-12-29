@@ -18,9 +18,14 @@ const registerUser = asynchandler(async (req, res) => {
         throw new Error(`User with given email already Exist!`);
     }
 
+    let profileImage;
+    if(req.file)
+        profileImage = req.file.filename
+
     const user = await User.create({
         firstName,
         lastName,
+        profileImage,
         email,
         password,
         isAdmin: false,
@@ -68,14 +73,6 @@ const authUser = asynchandler(async (req, res) => {
         if(userExists.isVerified) {
 
             const token = generateToken(userExists._id);
-    
-            // res.cookie('userToken', token, {
-            //     httpOnly: true,
-            //     // secure: process.env.NODE_ENV !== 'development',
-            //     secure: false,
-            //     sameSite: 'none',
-            //     maxAge: 30 * 24 * 60 * 60 * 1000
-            // });
     
             const userDataWithoutPassword = {
                 ...userExists._doc,
