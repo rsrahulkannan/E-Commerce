@@ -23,6 +23,11 @@ const Sidebar = () => {
                                         <i className="fa fa-fw fa-user-circle"></i>Dashboard
                                     </Link>
                                 </li>
+                                <li className="nav-item ">
+                                    <Link to={`/profile`} className="nav-link" >
+                                        <i className="fa fa-fw fa-user"></i>Profile
+                                    </Link>
+                                </li>
                             </ul>
                         </div>
                     </nav>

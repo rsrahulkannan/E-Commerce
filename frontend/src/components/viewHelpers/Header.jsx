@@ -43,7 +43,9 @@ const Header = () => {
                                         <h5 className="mb-0 text-white nav-user-name">{username} </h5>
                                         <span className="status"></span><span className="ml-2">Available</span>
                                     </div>
-                                    <a className="dropdown-item" href="#"><i className="fas fa-user mr-2"></i>Account</a>
+                                    <Link to={`/profile`} className="dropdown-item" >
+                                        <i className="fas fa-user mr-2"></i>Profile
+                                    </Link>
                                     <a className="dropdown-item" href="#"><i className="fas fa-cog mr-2"></i>Setting</a>
                                     <a className="dropdown-item" href="#" onClick={logout}><i className="fas fa-power-off mr-2"></i>Logout</a>
                                 </div>

@@ -1,20 +1,10 @@
 import React from 'react'
-import Header from '../viewHelpers/Header'
-import Sidebar from '../viewHelpers/Sidebar'
-import Footer from '../viewHelpers/Footer'
+import Breadcrumb from '../viewHelpers/Breadcrumb'
 
 const Dashboard = () => {
   return (
     <>
-      <Header />
-      <Sidebar />
-      <div className="dashboard-wrapper">
-        <div className="dashboard-ecommerce">
-          <div className="container-fluid dashboard-content ">
-          </div>
-        </div>
-        <Footer />
-      </div>
+      <Breadcrumb title='Infulencer Dashboard Template' description='Proin placerat ante duiullam scelerisque a velit ac porta, fusce sit amet vestibulum mi. Morbi lobortis pulvinar quam.' />
     </>
   )
 }

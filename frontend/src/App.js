@@ -8,6 +8,7 @@ import ResetPassword from './components/auth/ResetPassword';
 import Dashboard from './components/user/Dashboard';
 import Logout from './components/auth/Logout';
 import RequireAuth from "./components/auth/RequireAuth";
+import Profile from "./components/user/Profile";
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
         {/* User routes */}
         <Route element={<RequireAuth />}>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
 
         {/* catch all */}
