@@ -7,8 +7,8 @@ import EmailVerify from './components/auth/EmailVerify';
 import ResetPassword from './components/auth/ResetPassword';
 import Dashboard from './components/user/Dashboard';
 import Logout from './components/auth/Logout';
-import RequireAuth from "./components/auth/RequireAuth";
 import Profile from "./components/user/Profile";
+import PrivateRouter from "./components/auth/PrivateRouter";
 
 const App = () => {
   return (
@@ -24,7 +24,7 @@ const App = () => {
         <Route path="/logout" element={<Logout />} />
 
         {/* User routes */}
-        <Route element={<RequireAuth />}>
+        <Route element={<PrivateRouter />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
         </Route>

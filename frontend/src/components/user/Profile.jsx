@@ -1,21 +1,21 @@
 import React from 'react'
 import Breadcrumb from '../viewHelpers/Breadcrumb'
-import useAuth from '../../hooks/useAuth';
+import { useSelector } from 'react-redux';
 
 const Profile = () => {
-    const { auth } = useAuth();
+    const { currentUser } = useSelector((state) => state.user);
 
-    const firstName = auth?.user?.firstName;
-    const lastName = auth?.user?.lastName;
-    const email = auth?.user?.email;
+    const firstName = currentUser?.firstName;
+    const lastName = currentUser?.lastName;
+    const email = currentUser?.email;
     const username = `${firstName} ${lastName}`;
-    const profilePicture = auth.user.profileImage
-        ? `http://localhost:5001/ProfilePictures/${auth.user.profileImage}`
+    const profilePicture = currentUser.profileImage 
+        ? `http://localhost:5001/ProfilePictures/${currentUser.profileImage}` 
         : 'assets/images/avatar-1.jpg'
-        ;
+    ;
 
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
-    const joinedDate = auth?.user?.createdAt ? new Date(auth?.user?.createdAt).toLocaleDateString('en-US', options) : '';
+    const joinedDate = currentUser?.createdAt ? new Date(currentUser?.createdAt).toLocaleDateString('en-US', options) : '';
 
     return (
         <>

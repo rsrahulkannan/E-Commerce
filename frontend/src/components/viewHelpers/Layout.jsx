@@ -2,18 +2,18 @@ import React from 'react'
 import { Outlet, useNavigate } from "react-router-dom";
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
-import useAuth from '../../hooks/useAuth';
 import Header from '../viewHelpers/Header'
 import Sidebar from '../viewHelpers/Sidebar'
 import Footer from '../viewHelpers/Footer'
+import { useSelector } from 'react-redux';
 
 const Layout = () => {
-  const { auth } = useAuth();
+  const { currentUser } = useSelector((state) => state.user);
 
   return (
     <>
       {
-        auth?.user ? (
+        currentUser ? (
           <>
             <ToastContainer />
             <Header />

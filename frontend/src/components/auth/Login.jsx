@@ -3,16 +3,17 @@ import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './Auth.css'
-import useAuth from '../../hooks/useAuth';
+import { useDispatch } from 'react-redux';
+import { logInSuccess } from '../../redux/user/userSlice';
 
 const Login = () => {
-    const { setAuth } = useAuth();
 
     const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const location = useLocation();
     const from = location.state?.from?.pathname || '/dashboard';
 
@@ -34,9 +35,10 @@ const Login = () => {
         .then((res) => {
             const accessToken = res.data.data.token;
             const user = res.data.data.user;
+            console.log(user);
             toast.success(res?.data?.message || 'Login successfull!')
-            setAuth({ user, accessToken })
-            navigate(from, { replace: true });
+            dispatch(logInSuccess(user));
+            navigate('/');
         })
         .catch((err) => {
             toast.error(err.response?.data?.message || 'Login failed, Try again!')

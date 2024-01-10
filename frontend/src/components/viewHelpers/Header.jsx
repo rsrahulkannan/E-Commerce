@@ -1,27 +1,26 @@
 import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import AuthContext from '../../context/AuthProvider'
 import { toast } from 'react-toastify';
-import useAuth from '../../hooks/useAuth';
 import './Viewhelper.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { logOut } from '../../redux/user/userSlice.js';
 
 const Header = () => {
-    const { setAuth } = useContext(AuthContext);
     const navigate = useNavigate();
-    const { auth } = useAuth();
+    const dispatch = useDispatch();
+    const { currentUser } = useSelector((state) => state.user);
 
-    const firstName = auth?.user?.firstName;
-    const lastName = auth?.user?.lastName;
+    const firstName = currentUser?.firstName;
+    const lastName = currentUser?.lastName;
     const username = `${firstName} ${lastName}`;
-    const profilePicture = auth.user.profileImage 
-        ? `http://localhost:5001/ProfilePictures/${auth.user.profileImage}` 
+    const profilePicture = currentUser.profileImage 
+        ? `http://localhost:5001/ProfilePictures/${currentUser.profileImage}` 
         : 'assets/images/avatar-1.jpg'
     ;
 
     const logout = async () => {
-        setAuth({});
         toast.warning('You have been logged out from the system')
-        navigate('/');
+        dispatch(logOut())
     }
 
     return (
