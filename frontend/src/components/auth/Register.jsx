@@ -3,8 +3,11 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
 import './Auth.css'
+import { useSelector } from 'react-redux';
+import Dashboard from '../user/Dashboard';
 
 const Register = () => {
+    const { currentUser } = useSelector((state) => state.user);
     const inputRef = useRef(null);
 
     const [isLoading, setIsLoading] = useState(false)
@@ -28,17 +31,17 @@ const Register = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
-        if(!image)
+        if (!image)
             toast.error('Upload a image')
-        else if(!firstName)
+        else if (!firstName)
             toast.error('First name required')
-        else if(!lastName)
+        else if (!lastName)
             toast.error('Last name required')
-        else if(!email)
+        else if (!email)
             toast.error('Email required')
-        else if(!password)
+        else if (!password)
             toast.error('Password required')
-        else if(password !== confirmPassword)
+        else if (password !== confirmPassword)
             toast.error('Password do not match')
         else {
             setIsLoading(true);
@@ -56,104 +59,110 @@ const Register = () => {
                 },
                 withCredentials: true,
             })
-            .then((res) => {
-                toast.success(res?.data?.message || 'Registration successfull!')
-                navigate('/login')
-            })
-            .catch((err) => {
-                toast.error(err.response?.data?.message || 'Registration failed, Try again!')
-                setIsLoading(false);
-            })
+                .then((res) => {
+                    toast.success(res?.data?.message || 'Registration successfull!')
+                    navigate('/login')
+                })
+                .catch((err) => {
+                    toast.error(err.response?.data?.message || 'Registration failed, Try again!')
+                    setIsLoading(false);
+                })
         }
     }
 
     return (
         <>
-            <div className="splash-container">
-                <div className="card ">
-                    <div className="card-header text-center">
-                        <Link to={`/`}>
-                            <img className="logo-img" src="../logo-main.png" alt="logo" />
-                        </Link>
-                        <h3 className="mb-1">Sign Up</h3>
-                        <span className="splash-description">Please enter your user information.</span>
+            {
+                currentUser ? (
+                    <Dashboard />
+                ) : (
+                    <div className="splash-container">
+                        <div className="card ">
+                            <div className="card-header text-center">
+                                <Link to={`/`}>
+                                    <img className="logo-img" src="../logo-main.png" alt="logo" />
+                                </Link>
+                                <h3 className="mb-1">Sign Up</h3>
+                                <span className="splash-description">Please enter your user information.</span>
+                            </div>
+                            <div className="card-body">
+                                <form onSubmit={submitHandler}>
+                                    <div className="form-group text-center" onClick={handleImageClick}>
+                                        {
+                                            image ?
+                                                <img src={URL.createObjectURL(image)} style={{ width: '100%' }} /> :
+                                                <img src="../upload.jpg" />
+                                        }
+                                        <input
+                                            className="form-control form-control-lg"
+                                            type="file"
+                                            ref={inputRef}
+                                            onChange={uploadImage}
+                                            style={{ display: 'none' }}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <input
+                                            className="form-control form-control-lg"
+                                            type="text"
+                                            placeholder="First Name"
+                                            onChange={(e) => setFirstName(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <input
+                                            className="form-control form-control-lg"
+                                            type="text"
+                                            placeholder="Last Name"
+                                            onChange={(e) => setLastName(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <input
+                                            className="form-control form-control-lg"
+                                            type="email"
+                                            placeholder="Email"
+                                            onChange={(e) => setEmail(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <input
+                                            className="form-control form-control-lg"
+                                            type="password"
+                                            placeholder="Password"
+                                            onChange={(e) => setPassword(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <input
+                                            className="form-control form-control-lg"
+                                            type="password"
+                                            placeholder="Confirm Password"
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="custom-control custom-checkbox">
+                                            <input className="custom-control-input" type="checkbox" />
+                                            <span className="custom-control-label">By creating an account, you agree the <Link to={'/terms-conditions'} target='__blank'>terms and conditions.</Link></span>
+                                        </label>
+                                    </div>
+                                    {
+                                        isLoading ?
+                                            <div className='text-center'>
+                                                <span class="dashboard-spinner spinner-danger spinner-sm"></span>
+                                            </div> :
+                                            <button type="submit" className="btn btn-primary btn-lg btn-block">Register My Account</button>
+                                    }
+                                </form>
+                            </div>
+                            <div className="card-footer bg-white">
+                                <p>Already member? <Link to={'/login'} className="text-secondary">Login Here.</Link></p>
+                            </div>
+                        </div>
                     </div>
-                    <div className="card-body">
-                        <form onSubmit={submitHandler}>
-                            <div className="form-group text-center" onClick={handleImageClick}>
-                                {
-                                    image ?
-                                    <img src={URL.createObjectURL(image)} style={{ width: '100%' }} /> :
-                                    <img src="../upload.jpg" />
-                                }
-                                <input
-                                    className="form-control form-control-lg"
-                                    type="file" 
-                                    ref={inputRef}
-                                    onChange={uploadImage}
-                                    style={{ display: 'none'}}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    className="form-control form-control-lg"
-                                    type="text" 
-                                    placeholder="First Name" 
-                                    onChange={(e) => setFirstName(e.target.value)} 
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input 
-                                    className="form-control form-control-lg" 
-                                    type="text" 
-                                    placeholder="Last Name" 
-                                    onChange={(e) => setLastName(e.target.value)} 
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input 
-                                    className="form-control form-control-lg" 
-                                    type="email" 
-                                    placeholder="Email" 
-                                    onChange={(e) => setEmail(e.target.value)} 
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input 
-                                    className="form-control form-control-lg" 
-                                    type="password" 
-                                    placeholder="Password" 
-                                    onChange={(e) => setPassword(e.target.value)} 
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input 
-                                    className="form-control form-control-lg" 
-                                    type="password" 
-                                    placeholder="Confirm Password" 
-                                    onChange={(e) => setConfirmPassword(e.target.value)} 
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label className="custom-control custom-checkbox">
-                                    <input className="custom-control-input" type="checkbox" />
-                                    <span className="custom-control-label">By creating an account, you agree the <Link to={'/terms-conditions'} target='__blank'>terms and conditions.</Link></span>
-                                </label>
-                            </div>
-                            {
-                                isLoading ? 
-                                <div className='text-center'>
-                                    <span class="dashboard-spinner spinner-danger spinner-sm"></span>
-                                </div> :
-                                <button type="submit" className="btn btn-primary btn-lg btn-block">Register My Account</button>
-                            }
-                        </form>
-                    </div>
-                    <div className="card-footer bg-white">
-                        <p>Already member? <Link to={'/login'} className="text-secondary">Login Here.</Link></p>
-                    </div>
-                </div>
-            </div>
+                )
+            }
         </>
     )
 }

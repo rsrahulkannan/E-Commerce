@@ -6,7 +6,6 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import EmailVerify from './components/auth/EmailVerify';
 import ResetPassword from './components/auth/ResetPassword';
 import Dashboard from './components/user/Dashboard';
-import Logout from './components/auth/Logout';
 import Profile from "./components/user/Profile";
 import PrivateRouter from "./components/auth/PrivateRouter";
 
@@ -21,7 +20,6 @@ const App = () => {
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/users/:id/verify/:token' element={<EmailVerify />} />
         <Route path='/users/:id/reset/:token' element={<ResetPassword />} />
-        <Route path="/logout" element={<Logout />} />
 
         {/* User routes */}
         <Route element={<PrivateRouter />}>

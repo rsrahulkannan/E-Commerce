@@ -3,8 +3,12 @@ import axios from "axios"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import './Auth.css'
+import Dashboard from "../user/Dashboard"
+import { useSelector } from "react-redux"
 
 const ForgotPassword = () => {
+    const { currentUser } = useSelector((state) => state.user);
+
     const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState('')
     
@@ -36,6 +40,10 @@ const ForgotPassword = () => {
 
     return (
         <Fragment>
+        {
+            currentUser ? (
+                <Dashboard />
+            ) : (
             <div className="splash-container">
                 <div className="card ">
                     <div className="card-header text-center">
@@ -70,6 +78,8 @@ const ForgotPassword = () => {
                     </div>
                 </div>
             </div>
+                )
+            }
         </Fragment>
     )
 }

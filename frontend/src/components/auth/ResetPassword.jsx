@@ -3,8 +3,12 @@ import axios from "axios"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { toast } from "react-toastify"
 import './Auth.css'
+import { useSelector } from "react-redux"
+import Dashboard from "../user/Dashboard"
 
 const ResetPassword = () => {
+    const { currentUser } = useSelector((state) => state.user);
+
     const [validUrl, setValidUrl] = useState(true);
     const [isLoading, setIsLoading] = useState(false)
     const [password, setPassword] = useState('')
@@ -105,7 +109,7 @@ const ResetPassword = () => {
                         </div>
                     </div>
                 </div> :
-                <></>
+                <Dashboard />
             }
         </Fragment>
     )
