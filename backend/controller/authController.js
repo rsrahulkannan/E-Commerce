@@ -10,16 +10,16 @@ import bcrypt from 'bcryptjs';
 // route POST /api/users
 // @access Public
 const registerUser = asynchandler(async (req, res) => {
-    const {firstName, lastName, email, password} = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
-    const userExits = await User.findOne({email});
-    if(userExits) {
+    const userExits = await User.findOne({ email });
+    if (userExits) {
         res.status(401);
         throw new Error(`User with given email already Exist!`);
     }
 
     let profileImage;
-    if(req.file)
+    if (req.file)
         profileImage = req.file.filename
 
     const user = await User.create({
@@ -32,13 +32,13 @@ const registerUser = asynchandler(async (req, res) => {
         isVerified: false
     })
 
-    if(user) {
+    if (user) {
         const token = await Token.create({
             userId: user._id,
             token: crypto.randomBytes(32).toString('hex')
         })
 
-        if(token) {
+        if (token) {
             const url = `${process.env.BASE_URL}/users/${user._id}/verify/${token.token}`;
 
             await sendMail(user.firstName + ' ' + user.lastName, user.email, 'Verify your email', url);
@@ -47,7 +47,7 @@ const registerUser = asynchandler(async (req, res) => {
                 ...user._doc,
                 password: undefined,
             };
-    
+
             res.status(200).json({
                 data: {
                     user: userDataWithoutPassword
@@ -67,19 +67,22 @@ const registerUser = asynchandler(async (req, res) => {
 const authUser = asynchandler(async (req, res) => {
     const { email, password } = req.body;
 
-    const userExists = await User.findOne({email});
+    const userExists = await User.findOne({ email });
 
-    if(userExists && await userExists.matchPassword(password)) {
-        if(userExists.isVerified) {
+    if (userExists && await userExists.matchPassword(password)) {
+        if (userExists.isVerified) {
 
             const token = generateToken(userExists._id);
-    
+
             const userDataWithoutPassword = {
                 ...userExists._doc,
                 password: undefined,
             };
-    
-            res.status(200).json({
+
+            res.cookie('access_token', token, {
+                httpOnly: true,
+                expires: new Date(Date.now() + 3600000)
+            }).status(200).json({
                 data: {
                     token: token,
                     user: userDataWithoutPassword
@@ -91,15 +94,15 @@ const authUser = asynchandler(async (req, res) => {
                 userId: userExists._id
             });
 
-            if(!tokenExists) {
+            if (!tokenExists) {
                 const token = await Token.create({
                     userId: userExists._id,
                     token: crypto.randomBytes(32).toString('hex')
                 })
 
-                if(token) {
+                if (token) {
                     const url = `${process.env.BASE_URL}/users/${userExists._id}/verify/${token.token}`;
-        
+
                     await sendMail(userExists.firstName + ' ' + userExists.lastName, userExists.email, 'Verify your email', url);
                 }
             }
@@ -116,23 +119,23 @@ const authUser = asynchandler(async (req, res) => {
 const verifyToken = asynchandler(async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.id });
-        if(user) {
+        if (user) {
             const token = await Token.findOneAndDelete({
                 userId: req.params.id,
                 token: req.params.token
             });
 
-            if(token) {
-                await User.updateOne({ _id: user._id}, { $set: { isVerified: true }});
+            if (token) {
+                await User.updateOne({ _id: user._id }, { $set: { isVerified: true } });
 
                 res.status(200).json({ message: "Email verified successfully" });
             } else {
-            res.status(400);
-            throw new Error('Invalid link1')
-        }
+                res.status(400);
+                throw new Error('Invalid link')
+            }
         } else {
             res.status(400);
-            throw new Error('Invalid link2')
+            throw new Error('Invalid link')
         }
     } catch (error) {
         res.status(400);
@@ -144,18 +147,18 @@ const forgotPassword = asynchandler(async (req, res) => {
     const { email } = req.body;
 
     const user = await User.findOne({ email });
-    if(user) {
+    if (user) {
         const token = await Token.create({
             userId: user._id,
             token: crypto.randomBytes(32).toString('hex')
         })
 
-        if(token) {
+        if (token) {
             const url = `${process.env.BASE_URL}/users/${user._id}/reset/${token.token}`;
 
             await sendMail(user.firstName + ' ' + user.lastName, user.email, 'Forgot Password?', url);
         }
-    } 
+    }
 
     res.status(200).json({ message: 'We have send verification link to your Email' });
 })
@@ -163,21 +166,21 @@ const forgotPassword = asynchandler(async (req, res) => {
 const verifyUrl = asynchandler(async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.id });
-        if(user) {
+        if (user) {
             const token = await Token.findOne({
                 userId: req.params.id,
                 token: req.params.token
             });
 
-            if(token) {
+            if (token) {
                 res.status(200).json({ message: "Url verified successfully" });
             } else {
-            res.status(400);
-            throw new Error('Invalid link1')
-        }
+                res.status(400);
+                throw new Error('Invalid link')
+            }
         } else {
             res.status(400);
-            throw new Error('Invalid link2')
+            throw new Error('Invalid link')
         }
     } catch (error) {
         res.status(400);
@@ -186,30 +189,30 @@ const verifyUrl = asynchandler(async (req, res) => {
 });
 
 const resetPassword = asynchandler(async (req, res) => {
-    const {password} = req.body;
+    const { password } = req.body;
 
     try {
         const user = await User.findOne({ _id: req.params.id });
-        if(user) {
+        if (user) {
             const token = await Token.findOneAndDelete({
                 userId: req.params.id,
                 token: req.params.token
             });
 
-            if(token) {
+            if (token) {
                 const salt = await bcrypt.genSalt(10);
                 const hashedPassword = await bcrypt.hash(password, salt);
 
-                await User.updateOne({ _id: user._id}, { $set: { password: hashedPassword }});
+                await User.updateOne({ _id: user._id }, { $set: { password: hashedPassword } });
 
                 res.status(200).json({ message: "Password has benn updated", password: hashedPassword });
             } else {
                 res.status(400);
-                throw new Error('Invalid link1')
+                throw new Error('Invalid link')
             }
         } else {
             res.status(400);
-            throw new Error('Invalid link2')
+            throw new Error('Invalid link')
         }
     } catch (error) {
         res.status(400);
@@ -217,11 +220,16 @@ const resetPassword = asynchandler(async (req, res) => {
     }
 });
 
+const signout = (req, res) => {
+    res.clearCookie('access_token').status(200).json({ message: 'Signout success!'});
+};
+
 export {
     registerUser,
     authUser,
     verifyToken,
     forgotPassword,
     resetPassword,
-    verifyUrl
+    verifyUrl,
+    signout
 }

@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import connectDB from './config/db.js';
 import cors from 'cors';
@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static('./backend/Public'))
 
-app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => res.send(`Server is ready`));
 
