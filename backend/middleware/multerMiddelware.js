@@ -1,5 +1,6 @@
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -24,4 +25,12 @@ const uploadMiddleware = multer({
     fileFilter
 })
 
-export { uploadMiddleware };
+const removeMiddleware = (filename) => {
+    try {
+        fs.unlinkSync(`./backend/Public/ProfilePictures/${filename}`);
+    } catch (error) {
+        console.error(`Error removing file ${filename}: ${error.message}`);
+    }
+}
+
+export { uploadMiddleware, removeMiddleware };

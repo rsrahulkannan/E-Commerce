@@ -2,6 +2,7 @@ import asynchandler from 'express-async-handler';
 import User from '../model/userModel.js';
 import sendMail from '../utils/sendEmail.js';
 import bcrypt from 'bcryptjs';
+import { removeMiddleware } from '../middleware/multerMiddelware.js';
 
 const updateUser = asynchandler(async ( req, res) => {
     if (req.user.userId !== req.params.id) {
@@ -10,6 +11,16 @@ const updateUser = asynchandler(async ( req, res) => {
     }
 
     const { firstName, lastName } = req.body;
+
+    let profileImage;
+    let oldProfilePicture;
+    if (req.file)
+    {
+        profileImage = req.file.filename;
+
+        const user = await User.findById(req.params.id);
+        oldProfilePicture = user.profileImage;
+    }
     
     try {
         const updateUser = await User.findByIdAndUpdate(
@@ -18,6 +29,7 @@ const updateUser = asynchandler(async ( req, res) => {
                 $set: {
                     firstName,
                     lastName,
+                    profileImage
                 }
             },
             { new: true }
@@ -26,6 +38,9 @@ const updateUser = asynchandler(async ( req, res) => {
             ...updateUser._doc,
             password: undefined,
         };
+
+        if(oldProfilePicture)
+            removeMiddleware(oldProfilePicture)
 
         res.status(200).json({
             data: {

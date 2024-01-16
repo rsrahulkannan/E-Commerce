@@ -5,6 +5,6 @@ import { verifyUser } from '../utils/verifyUser.js';
 
 const router = express.Router();
 
-router.post('/update/:id', verifyUser, updateUser);
+router.post('/update/:id', verifyUser, uploadMiddleware.single('image'), updateUser);
 
 export default router;
