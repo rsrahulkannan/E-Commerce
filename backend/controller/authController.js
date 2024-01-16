@@ -205,7 +205,7 @@ const resetPassword = asynchandler(async (req, res) => {
 
                 await User.updateOne({ _id: user._id }, { $set: { password: hashedPassword } });
 
-                res.status(200).json({ message: "Password has benn updated", password: hashedPassword });
+                res.status(200).json({ message: "Password has been updated", password: hashedPassword });
             } else {
                 res.status(400);
                 throw new Error('Invalid link')

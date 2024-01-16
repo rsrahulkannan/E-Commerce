@@ -4,7 +4,7 @@ import sendMail from '../utils/sendEmail.js';
 import bcrypt from 'bcryptjs';
 import { removeMiddleware } from '../middleware/multerMiddelware.js';
 
-const updateUser = asynchandler(async ( req, res) => {
+const updateUser = asynchandler(async (req, res) => {
     if (req.user.userId !== req.params.id) {
         res.status(401);
         throw new Error(`You can update only your account!`);
@@ -14,14 +14,13 @@ const updateUser = asynchandler(async ( req, res) => {
 
     let profileImage;
     let oldProfilePicture;
-    if (req.file)
-    {
+    if (req.file) {
         profileImage = req.file.filename;
 
-        const user = await User.findById(req.params.id);
-        oldProfilePicture = user.profileImage;
+        const userExists = await User.findById(req.params.id);
+        oldProfilePicture = userExists.profileImage;
     }
-    
+
     try {
         const updateUser = await User.findByIdAndUpdate(
             req.params.id,
@@ -39,7 +38,7 @@ const updateUser = asynchandler(async ( req, res) => {
             password: undefined,
         };
 
-        if(oldProfilePicture)
+        if (oldProfilePicture)
             removeMiddleware(oldProfilePicture)
 
         res.status(200).json({
@@ -54,6 +53,43 @@ const updateUser = asynchandler(async ( req, res) => {
     }
 })
 
+const changePassword = asynchandler(async (req, res) => {
+    if (req.user.userId !== req.params.id) {
+        res.status(401);
+        throw new Error(`You can update only your account!`);
+    }
+
+    const { oldPassword, newPassword } = req.body;
+
+    const userExists = await User.findById(req.params.id);
+    if (userExists && await userExists.matchPassword(oldPassword)) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        try {
+            const updateUser = await User.findByIdAndUpdate(req.params.id, { $set: { password: hashedPassword } });
+
+            const userDataWithoutPassword = {
+                ...updateUser._doc,
+                password: undefined,
+            };
+            res.status(200).json({
+                message: "Password has been updated",
+                data: {
+                    user: userDataWithoutPassword
+                }
+            });
+        } catch (error) {
+            res.status(401);
+            throw new Error(error);
+        }
+    } else {
+        res.status(400);
+        throw new Error('Old password is incorrect');
+    }
+})
+
 export {
-    updateUser
+    updateUser,
+    changePassword
 }
