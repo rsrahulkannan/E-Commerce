@@ -6,8 +6,8 @@ import sendMail from '../utils/sendEmail.js';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 
-// @desc Register suer
-// route POST /api/users
+// @desc Register user
+// route POST /api/auth
 // @access Public
 const registerUser = asynchandler(async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
