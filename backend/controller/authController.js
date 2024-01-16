@@ -18,6 +18,8 @@ const registerUser = asynchandler(async (req, res) => {
         throw new Error(`User with given email already Exist!`);
     }
 
+    const countUser = await User.count();
+
     let profileImage;
     if (req.file)
         profileImage = req.file.filename
@@ -28,7 +30,7 @@ const registerUser = asynchandler(async (req, res) => {
         profileImage,
         email,
         password,
-        isAdmin: false,
+        isAdmin: countUser ? false : true,
         isVerified: false
     })
 
