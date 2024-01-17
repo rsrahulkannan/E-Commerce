@@ -1,5 +1,6 @@
 import asynchandler from 'express-async-handler';
 import Product from '../model/productModel.js';
+import { removeMiddleware } from '../middleware/multerMiddelware.js';
 
 // @desc Get Products
 // route GET /api/product
@@ -57,10 +58,15 @@ const addProduct = asynchandler(async (req, res) => {
 const viewProduct = asynchandler(async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
-        res.status(200).json({
-            product: product,
-            message: 'Product fetched by id'
-        })
+        if (product) {
+            res.status(200).json({
+                product: product,
+                message: 'Product fetched by id'
+            })
+        } else {
+            res.status(400);
+            throw new Error('Product id is invalid');
+        }
     } catch (error) {
         res.status(401);
         throw new Error(error);
@@ -74,9 +80,27 @@ const updateProduct = asynchandler(async (req, res) => {
 });
 
 const deleteProduct = asynchandler(async (req, res) => {
-    res.status(201).json({
-        message: 'Coming soon'
-    })
+    try {
+        const product = await Product.findById(req.params.id);
+        if (product) {
+            const images = product.images;
+            images.forEach(image => {
+                removeMiddleware(req, image.path);
+            });
+
+            await Product.findByIdAndDelete(req.params.id);
+            res.status(200).json({
+                message: 'Product has been deleted'
+            })
+
+        } else {
+            res.status(400);
+            throw new Error('Product id is invalid');
+        }
+    } catch (error) {
+        res.status(401);
+        throw new Error(error);
+    }
 });
 
 export {

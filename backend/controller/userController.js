@@ -39,7 +39,7 @@ const updateUser = asynchandler(async (req, res) => {
         };
 
         if (oldProfilePicture)
-            removeMiddleware(oldProfilePicture)
+            removeMiddleware(req, oldProfilePicture)
 
         res.status(200).json({
             data: {
