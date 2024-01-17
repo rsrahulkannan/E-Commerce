@@ -1,10 +1,20 @@
 import asynchandler from 'express-async-handler';
 import Product from '../model/productModel.js';
 
+// @desc Get Products
+// route GET /api/product
+// @access Private
 const allProducts = asynchandler(async (req, res) => {
-    res.status(201).json({
-        message: 'Coming soon'
-    })
+    try {
+        const products = await Product.find();
+        res.status(200).json({
+            products: products,
+            message: 'Fetched all products'
+        })
+    } catch (error) {
+        res.status(401);
+        throw new Error(error);
+    }
 });
 
 // @desc Add Product
@@ -32,10 +42,8 @@ const addProduct = asynchandler(async (req, res) => {
 
         await newProduct.save();
         res.status(200).json({
-            data: {
-                product: newProduct
-            },
-            message: 'You have been updated your account'
+            product: newProduct,
+            message: 'Product has been created'
         })
     } catch (error) {
         res.status(401);
