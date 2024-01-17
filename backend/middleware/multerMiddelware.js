@@ -4,7 +4,10 @@ import fs from 'fs';
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './backend/Public/ProfilePictures');
+        if(req.originalUrl.startsWith('/api/product'))
+            cb(null, './backend/Public/ProductImages');
+        else
+            cb(null, './backend/Public/ProfilePictures');
     }, 
     filename: (req, file, cb) => {
         cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname))
