@@ -51,10 +51,20 @@ const addProduct = asynchandler(async (req, res) => {
     }
 });
 
+// @desc Get a Product
+// route GET /api/product/:id
+// @access Private
 const viewProduct = asynchandler(async (req, res) => {
-    res.status(201).json({
-        message: 'Coming soon'
-    })
+    try {
+        const product = await Product.findById(req.params.id);
+        res.status(200).json({
+            product: product,
+            message: 'Product fetched by id'
+        })
+    } catch (error) {
+        res.status(401);
+        throw new Error(error);
+    }
 });
 
 const updateProduct = asynchandler(async (req, res) => {
